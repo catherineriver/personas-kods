@@ -1,5 +1,8 @@
 # personas-kods
 
+[![CI](https://github.com/catherineriver/personas-kods/actions/workflows/ci.yml/badge.svg)](https://github.com/catherineriver/personas-kods/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Validate, parse, format and generate Latvian personal codes (*personas kods*).
 Zero dependencies, TypeScript types included.
 
@@ -12,6 +15,13 @@ Supports both formats in circulation:
 
 Many validators reject new-format codes because they look for a date in the
 first six digits. This one does not.
+
+## Why
+
+Since 1 July 2017 Latvia issues personal codes that start with `32` and carry
+no birth date. Validators written for the old `DDMMYY-CNNNK` layout look for a
+date in the first six digits and reject these codes, even though they are
+valid. This package handles both formats.
 
 ## Install
 
