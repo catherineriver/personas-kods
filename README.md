@@ -57,10 +57,46 @@ generate({ format: "legacy", birthDate: "1990-05-17" }); // "170590-1XXXX"
 
 ## API
 
-### `validate(input, options?): ValidationResult`
+| Function | Returns | Purpose |
+|---|---|---|
+| [`validate(input, options?)`](#validateinput-options) | `ValidationResult` | Full verdict with details or the reason for rejection |
+| [`isValid(input, options?)`](#isvalidinput-options) | `boolean` | Quick yes/no |
+| [`format(input, options?)`](#formatinput-options) | `string \| null` | Canonical `XXXXXX-XXXXX` form |
+| [`getBirthDate(input, options?)`](#getbirthdateinput-options) | `string \| null` | Birth date from a legacy code |
+| [`generate(options?)`](#generateoptions) | `string` | Random valid code for tests |
+| [`checkDigit(firstTenDigits)`](#checkdigitfirsttendigits) | `number` | Check digit for the first ten digits |
 
-Returns `{ valid: true, format, digits, formatted, birthDate }` or
-`{ valid: false, error }`. Never throws.
+`validate`, `isValid`, `format` and `getBirthDate` never throw, whatever you
+pass in. Anything that is not a string is simply invalid.
+
+### Validation options
+
+Shared by `validate`, `isValid`, `format` and `getBirthDate`.
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `newFormatChecksum` | `boolean` | `false` | Also require new-format (`32…`) codes to end in a valid check digit. See [How the rules work](#how-the-rules-work). |
+
+### `validate(input, options?)`
+
+```ts
+validate(input: unknown, options?: ValidateOptions): ValidationResult
+```
+
+Leading and trailing whitespace is ignored. Nothing else is: spaces inside
+the code, or a hyphen in the wrong place, make it `invalid_format`.
+
+**Valid result**
+
+| Field | Type | Description |
+|---|---|---|
+| `valid` | `true` | |
+| `format` | `"legacy" \| "new"` | Which kind of code it is |
+| `digits` | `string` | The 11 digits, no hyphen |
+| `formatted` | `string` | Canonical `XXXXXX-XXXXX` |
+| `birthDate` | `string \| null` | `YYYY-MM-DD` for legacy codes, `null` for new ones |
+
+**Invalid result**: `{ valid: false, error }`
 
 | `error` | Meaning |
 |---|---|
@@ -70,37 +106,95 @@ Returns `{ valid: true, format, digits, formatted, birthDate }` or
 | `invalid_date` | Legacy code, first six digits are not a real date |
 | `invalid_checksum` | Check digit does not match |
 
-Leading and trailing whitespace is ignored. Nothing else is: spaces inside
-the code or a hyphen in the wrong place make it `invalid_format`.
+```js
+validate("161175-19997");
+// { valid: true, format: "legacy", digits: "16117519997",
+//   formatted: "161175-19997", birthDate: "1975-11-16" }
 
-Options:
+validate("161175-19998");
+// { valid: false, error: "invalid_checksum" }
+```
 
-- `newFormatChecksum` (default `false`): also require new-format codes to
-  end in a valid check digit. See [New format](#how-the-rules-work).
+### `isValid(input, options?)`
 
-`isValid`, `format` and `getBirthDate` accept the same options.
+```ts
+isValid(input: unknown, options?: ValidateOptions): boolean
+```
 
-### `isValid(input, options?): boolean`
+`true` when the code is valid in either format.
 
-### `format(input, options?): string | null`
+```js
+isValid("16117519997");  // true
+isValid("323456-78901"); // true
+isValid("161375-19997"); // false (month 13)
+```
 
-Canonical `XXXXXX-XXXXX` form, `null` if invalid.
+### `format(input, options?)`
 
-### `getBirthDate(input, options?): string | null`
+```ts
+format(input: unknown, options?: ValidateOptions): string | null
+```
 
-ISO date for legacy codes. `null` for invalid codes and for new-format codes.
+Canonical `XXXXXX-XXXXX` form, or `null` if the code is invalid.
 
-### `generate(options?): string`
+```js
+format("16117519997"); // "161175-19997"
+format("nope");        // null
+```
+
+### `getBirthDate(input, options?)`
+
+```ts
+getBirthDate(input: unknown, options?: ValidateOptions): string | null
+```
+
+Birth date as `YYYY-MM-DD` for a valid legacy code. `null` for invalid codes
+and for new-format codes, which do not encode a date.
+
+```js
+getBirthDate("161175-19997"); // "1975-11-16"
+getBirthDate("323456-78901"); // null
+```
+
+### `generate(options?)`
+
+```ts
+generate(options?: GenerateOptions): string
+```
 
 Random syntactically valid code for tests and fixtures. Codes in both formats
-end in a valid check digit, so they pass stricter validators too.
-Options: `format` (`"new"` by default), `birthDate` (`YYYY-MM-DD`, legacy
-only), `hyphen` (`true` by default), `random` (custom random source).
+end in a valid check digit, so they pass stricter validators too. Throws
+`RangeError` on invalid options.
 
-A generated code may coincide with a real person's code. Use it for test
-data only.
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `format` | `"new" \| "legacy"` | `"new"` | Which kind of code to produce |
+| `birthDate` | `string` | random | `YYYY-MM-DD`, 1800 to 2099. Legacy only; passing it with `"new"` throws |
+| `hyphen` | `boolean` | `true` | Include the hyphen |
+| `random` | `() => number` | `Math.random` | Random source returning a number in `[0, 1)`, for deterministic output |
 
-### `checkDigit(firstTenDigits): number`
+```js
+generate();                                              // "32XXXX-XXXXX"
+generate({ format: "legacy", birthDate: "1990-05-17" }); // "170590-1XXXX"
+generate({ hyphen: false });                             // "32XXXXXXXXX"
+```
+
+> [!WARNING]
+> A generated code may coincide with a real person's code. Use it for test
+> data only.
+
+### `checkDigit(firstTenDigits)`
+
+```ts
+checkDigit(firstTenDigits: string): number
+```
+
+Check digit (0 to 9) for the first ten digits of a code. Throws `TypeError`
+unless given exactly ten digits.
+
+```js
+checkDigit("1611751999"); // 7
+```
 
 ## How the rules work
 
