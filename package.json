@@ -1,0 +1,27 @@
+{
+  "name": "personas-kods",
+  "version": "0.1.0",
+  "description": "Validate, parse, format and generate Latvian personal codes (personas kods), including the post-2017 \"32\" format",
+  "keywords": ["latvia", "latvian", "personas kods", "personal code", "national id", "validator", "lv"],
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && node --test",
+    "prepublishOnly": "npm test"
+  },
+  "devDependencies": {
+    "typescript": ">=5.6"
+  }
+}
