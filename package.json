@@ -1,7 +1,7 @@
 {
   "name": "personas-kods",
-  "version": "0.1.0",
-  "description": "Validate, parse, format and generate Latvian personal codes (personas kods), including the post-2017 \"32\" format",
+  "version": "0.1.1",
+  "description": "Latvian personal code (personas kods) validator that accepts the new 2017 \"32\" codes. Validate, parse, format and generate. Zero dependencies, TypeScript types.",
   "author": "catherineriver (https://github.com/catherineriver)",
   "homepage": "https://github.com/catherineriver/personas-kods#readme",
   "repository": {
@@ -17,8 +17,13 @@
     "personas kods",
     "personas-kods",
     "personal code",
+    "personal id code",
+    "personal identification code",
     "personal identity number",
+    "national identity number",
     "national id",
+    "tax id",
+    "tin",
     "id validator",
     "validator",
     "check digit",

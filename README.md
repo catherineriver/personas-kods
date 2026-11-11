@@ -1,9 +1,11 @@
 # personas-kods
 
+[![npm](https://img.shields.io/npm/v/personas-kods.svg)](https://www.npmjs.com/package/personas-kods)
 [![CI](https://github.com/catherineriver/personas-kods/actions/workflows/ci.yml/badge.svg)](https://github.com/catherineriver/personas-kods/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Validate, parse, format and generate Latvian personal codes (*personas kods*).
+Validate, parse, format and generate Latvian personal codes (*personas kods*),
+including the new `32…` codes that many validators reject.
 Zero dependencies, TypeScript types included.
 
 Supports both formats in circulation:
