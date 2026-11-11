@@ -10,8 +10,11 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const npm = process.platform === "win32" ? "npm.cmd" : "npm";
+// `npm publish --dry-run` exports npm_config_dry_run to child processes; left
+// in place it would make the nested `npm pack` skip writing the tarball.
+const env = { ...process.env, npm_config_dry_run: "false" };
 const run = (cmd, args, cwd) =>
-  execFileSync(cmd, args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], shell: process.platform === "win32" });
+  execFileSync(cmd, args, { cwd, env, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], shell: process.platform === "win32" });
 
 let work, pkgDir, packed;
 
